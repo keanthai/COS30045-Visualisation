@@ -23,6 +23,9 @@ export default function Home() {
 
       <BarChart/>
 
+      <form onSubmit={checkLogin}>
+
+      </form>
 
     </div>
   )
