@@ -1,72 +1,80 @@
-import { NextPage } from "next";
+import { axisBottom, axisLeft, scaleBand, scaleLinear, select } from "d3";
 import { useEffect, useRef } from "react";
-import {
-  select,
-  line,
-  curveCardinal,
-  scaleLinear,
-  axisBottom,
-  axisLeft,
-} from "d3";
 
-const BarChart = () => {
-  const svgRef = useRef();
+export default function BarChart() {
 
-  const data = [
-    { x: 0, y: 10 },
-    { x: 1, y: 20 },
-    { x: 2, y: 15 },
-    { x: 3, y: 25 },
-    { x: 4, y: 30 },
-    { x: 4, y: 30 },
-    { x: 4, y: 21 },
-    { x: 4, y: 56 },
-    { x: 4, y: 43 },
+  const data= [
+    { label: "Europe", value: 100 },
+    { label: "Asia", value: 200 },
+    { label: "Africa", value: 160 },
+    { label: "Northern America", value: 150 },
+    { label: "Latin America", value: 150 },
+    { label: "Oceania", value: 150 }
   ];
 
+  const margin = { top: 0, right: 0, bottom: 0, left: 0 };
+  const width = 500 - margin.left - margin.right;
+  const height = 300 - margin.top - margin.bottom;
+
+  const scaleX = scaleBand()
+    .domain(data.map(({ label }) => label))
+    .range([0, width]);
+
+    const scaleY = scaleLinear()
+    .domain([0, Math.max(...data.map(({ value }) => value))])
+    .range([height, 0]);
+
+  return (
+    <svg
+    width={width + margin.left + margin.right}
+    height={height + margin.top + margin.bottom}
+  >
+    <g transform={`translate(${margin.left}, ${margin.top})`}>
+      <AxisBottom scale={scaleX} transform={`translate(0, ${height})`} />
+      <AxisLeft scale={scaleY} />
+      <Bars data={data} height={height} scaleX={scaleX} scaleY={scaleY} />
+    </g>
+  </svg>
+  );
+}
+
+function AxisBottom({ scale, transform }) {
+  const ref = useRef(null);
+
   useEffect(() => {
-    if (svgRef.current) {
-      const svg = select(svgRef.current);
-
-      //scales
-      const xScale = scaleLinear()
-        .domain([0, data.length - 1])
-        .range([0, 300]);
-
-      const yScale = scaleLinear().domain([0, 100]).range([100, 0]);
-
-      //axes
-      const xAxis = axisBottom(xScale).ticks(data.length);
-      svg.select(".x-axis").style("transform", "translateY(100px)").call(xAxis);
-
-      const yAxis = axisLeft(yScale);
-      svg.select(".y-axis").style("transform", "translateX(0px)").call(yAxis);
-
-      //line generator
-      const myLine = line()
-        .x((d, i) => xScale(i))
-        .y((d) => yScale(d.y))
-        .curve(curveCardinal);
-
-      //drawing the line
-      svg
-        .selectAll(".line")
-        .data([data])
-        .join("path")
-        .attr("class", "line")
-        .attr("d", myLine)
-        .attr("fill", "none")
-        .attr("stroke", "#00bfa6");
+    if (ref.current) {
+      select(ref.current).call(axisBottom(scale));
     }
-  }, []);
+  }, [scale]);
 
-  return(
-    <div className=" h-96 w-1/2 border border-gray-400 flex justify-center items-center">
-      <svg ref={svgRef}></svg>
-    </div>
-  )
-  
-  
-};
+  return <g ref={ref} transform={transform} />;
+}
 
-export default BarChart;
+function AxisLeft({ scale }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      select(ref.current).call(axisLeft(scale));
+    }
+  }, [scale]);
+
+  return <g ref={ref} />;
+}
+
+function Bars({ data, height, scaleX, scaleY }) {
+  return (
+    <>
+      {data.map(({ value, label }) => (
+        <rect
+          key={`bar-${label}`}
+          x={scaleY(label)}
+          y={scaleY(value)}
+          width={scaleX.bandwidth()}
+          height={height - scaleY(value)}
+          fill="teal"
+        />
+      ))}
+    </>
+  );
+}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import classNames from 'classnames'
 import BarChart from '../app/component/BarChart'
+import PieChart from '../app/component/PieChart.jsx'
 
 export default function Home() {
 
@@ -21,11 +22,10 @@ export default function Home() {
        "bg-white text-blue-700 border-2 border-blue-700", " px-6 py-3 rounded-lg mx-2 shadow-md")}
       onClick={()=> setDataState("region")}>Geographic Regions</button>
 
-      <BarChart/>
+      {
+        dataState == "income" ?<PieChart/> :<BarChart/>
+      }
 
-      <form onSubmit={checkLogin}>
-
-      </form>
 
     </div>
   )
