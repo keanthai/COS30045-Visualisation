@@ -208,7 +208,7 @@ function StackArea() {
   return (
     <div className="w-[1000px]">
       <div className=" border-2 px-10 py-5 flex flex-col justify-center items-center space-y-1 border-primary rounded-lg shadow-lg select-none">
-        <h1 className=" text-2xl font-bold">Conflict</h1>
+        <h1 className=" text-2xl font-bold">Disaster</h1>
         <div id="stack"></div>
         <p>Total number of Disaster Internal Displacement</p>
       </div>
