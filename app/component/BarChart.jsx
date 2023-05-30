@@ -86,7 +86,7 @@ function BarChart({ timeRange }) {
         .attr("x", 100)
         .attr("y", 70)
         .style("font", "22px times")
-        .text("#of Disaster Internal Displacement People")
+        .text("#of Internally Displaced People (IDPs)")
         .attr("text-anchor", "start");
 
       //insert bar

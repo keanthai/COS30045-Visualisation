@@ -11,7 +11,7 @@ function StackArea() {
     d3.select("#stack").select("svg").remove();
 
     // set the dimensions and margins of the graph
-    var margin = { top: 60, right: 230, bottom: 50, left: 150 },
+    var margin = { top: 60, right: 230, bottom: 100, left: 150 },
       width = 900 - margin.left - margin.right,
       height = 400 - margin.top - margin.bottom;
 
@@ -210,6 +210,7 @@ function StackArea() {
       <div className=" border-2 px-10 py-5 flex flex-col justify-center items-center space-y-1 border-primary rounded-lg shadow-lg select-none">
         <h1 className=" text-2xl font-bold">Conflict</h1>
         <div id="stack"></div>
+        <p>Total number of Disaster Internal Displacement</p>
       </div>
       <div className=" min-h-[200px] border-2 border-primary rounded-lg mt-5 py-4 px-4 space-y-4  shadow-lg select-none">
         <h1 className="text-2xl font-bold text-center ">Description</h1>
