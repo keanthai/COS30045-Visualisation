@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.pieBox{
+    @apply inline-block;
+}
+
+#mainTooltip{
+    @apply absolute min-w-[90px] bg-white text-primary border-2 border-primary rounded-lg shadow-lg px-6 py-3;
+}
+
+#value{
+    @apply text-xl
+}

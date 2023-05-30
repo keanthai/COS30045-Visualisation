@@ -1,80 +1,159 @@
-import { axisBottom, axisLeft, scaleBand, scaleLinear, select } from "d3";
-import { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
+import * as d3 from "d3";
 
-export default function BarChart() {
+function BarChart({ timeRange }) {
+  useEffect(() => {
+    drawChart();
+  }, [timeRange]);
 
-  const data= [
-    { label: "Europe", value: 100 },
-    { label: "Asia", value: 200 },
-    { label: "Africa", value: 160 },
-    { label: "Northern America", value: 150 },
-    { label: "Latin America", value: 150 },
-    { label: "Oceania", value: 150 }
-  ];
+  function drawChart() {
+    var width = 900,
+      height = 500;
 
-  const margin = { top: 0, right: 0, bottom: 0, left: 0 };
-  const width = 500 - margin.left - margin.right;
-  const height = 300 - margin.top - margin.bottom;
+    // Remove the old svg
+    d3.select("svg").remove();
 
-  const scaleX = scaleBand()
-    .domain(data.map(({ label }) => label))
-    .range([0, width]);
+    var svg = d3
+      .select("#mainChart")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
 
-    const scaleY = scaleLinear()
-    .domain([0, Math.max(...data.map(({ value }) => value))])
-    .range([height, 0]);
+    var margin = 200,
+      width = svg.attr("width") - margin,
+      height = svg.attr("height") - margin;
 
+    var xScale = d3.scaleBand().range([0, width]).padding(0.4),
+      yScale = d3.scaleLinear().range([height, 0]);
+
+    var g = svg
+      .append("g")
+      .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+    d3.csv("conflict_violence.csv").then(function (dataList) {
+      //filter
+      var data = dataList.filter(
+        (item) =>
+          item.year >= 2013 + timeRange[0] && item.year <= 2013 + timeRange[1]
+      );
+
+      xScale.domain(
+        data.map(function (d) {
+          return d.year;
+        })
+      );
+      yScale.domain([
+        0,
+        d3.max(data, function (d) {
+          return d.value;
+        }),
+      ]);
+
+      g.append("g")
+        .style("font", "16px times")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(xScale));
+
+      g.append("g")
+        .style("font", "16px times")
+        .call(
+          d3
+            .axisLeft(yScale)
+            .tickFormat(function (d) {
+              return d.toString().substring(0, 2) + " M";
+            })
+            .ticks(10)
+        )
+        .append("text")
+        .attr("y", 6)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text("value");
+
+      // Add X axis label:
+      svg
+        .append("text")
+        .attr("text-anchor", "end")
+        .attr("x", width + 100)
+        .attr("y", height + 150)
+        .style("font", "22px times")
+        .text("Time (year)");
+
+      // Add Y axis label:
+      svg
+        .append("text")
+        .attr("text-anchor", "end")
+        .attr("x", 100)
+        .attr("y", 70)
+        .style("font", "22px times")
+        .text("#of Disaster Internal Displacement People")
+        .attr("text-anchor", "start");
+
+      //insert bar
+      g.selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", function (d) {
+          return xScale(d.year);
+        })
+        .attr("y", function (d) {
+          return yScale(d.value);
+        })
+        .attr("width", xScale.bandwidth())
+        .attr("height", function (d) {
+          return height - yScale(d.value);
+        })
+        .attr("fill", "#2A58BF")
+        .on("mousemove", function (event, d) {
+          d3.select(this).attr("fill", "orange");
+
+          var mousePos = [event.clientX, event.clientY];
+
+          d3.select("#mainTooltip")
+            .style("left", mousePos[0] + "px")
+            .style("top", mousePos[1] + "px")
+            .select("#value")
+            .attr("text-anchor", "middle")
+            .html(d.year + "<br />" + d.value + " People");
+
+          d3.select("#mainTooltip").classed("hidden", false);
+        })
+        .on("mouseout", function (d) {
+          d3.select(this).attr("fill", "#2A58BF");
+          d3.select("#mainTooltip").classed("hidden", true);
+        });
+    });
+  }
   return (
-    <svg
-    width={width + margin.left + margin.right}
-    height={height + margin.top + margin.bottom}
-  >
-    <g transform={`translate(${margin.left}, ${margin.top})`}>
-      <AxisBottom scale={scaleX} transform={`translate(0, ${height})`} />
-      <AxisLeft scale={scaleY} />
-      <Bars data={data} height={height} scaleX={scaleX} scaleY={scaleY} />
-    </g>
-  </svg>
+    <div className="w-[1000px]">
+      <div className="  border-2 px-10 py-5 flex flex-col justify-center items-center space-y-1 border-primary rounded-lg shadow-lg select-none">
+        <h1 className=" text-2xl font-bold">Conflict</h1>
+        {/* <svg width="900" height="500"></svg> */}
+        <div id="mainChart"></div>
+        <div id="mainTooltip" className="hidden">
+          <p>
+            <span id="value"></span>
+          </p>
+        </div>
+        <p>Total number of IDPs</p>
+      </div>
+      <div className=" min-h-[200px] border-2 border-primary rounded-lg mt-5 py-4 px-4 space-y-4  shadow-lg select-none">
+        <h1 className="text-2xl font-bold text-center ">Description</h1>
+        <p className=" text-lg text-left">
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facere
+          doloremque aspernatur reprehenderit odio, tempora temporibus dolorum
+          expedita veritatis eius iste inventore vel hic maiores eaque provident
+          unde minima magni sed Lorem ipsum dolor, sit amet consectetur
+          adipisicing elit. Reiciendis, recusandae tempora autem maxime minus
+          cupiditate dolore aliquid iure quos laudantium. Omnis, earum dolor
+          mollitia voluptatibus molestias adipisci repellendus quibusdam aut?
+          lo!
+        </p>
+      </div>
+    </div>
   );
 }
 
-function AxisBottom({ scale, transform }) {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (ref.current) {
-      select(ref.current).call(axisBottom(scale));
-    }
-  }, [scale]);
-
-  return <g ref={ref} transform={transform} />;
-}
-
-function AxisLeft({ scale }) {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (ref.current) {
-      select(ref.current).call(axisLeft(scale));
-    }
-  }, [scale]);
-
-  return <g ref={ref} />;
-}
-
-function Bars({ data, height, scaleX, scaleY }) {
-  return (
-    <>
-      {data.map(({ value, label }) => (
-        <rect
-          key={`bar-${label}`}
-          x={scaleY(label)}
-          y={scaleY(value)}
-          width={scaleX.bandwidth()}
-          height={height - scaleY(value)}
-          fill="teal"
-        />
-      ))}
-    </>
-  );
-}
+export default BarChart;
