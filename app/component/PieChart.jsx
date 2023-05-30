@@ -147,8 +147,8 @@ function PieChart() {
 
   return(
     
-    <div className="w-[900px]">
-    <div className="  border-2 px-10 py-5 flex flex-col justify-center items-center space-y-4 border-primary rounded-lg shadow-lg select-none">
+    <div className="w-[800px]">
+    <div className="  border-2 px-10 py-5 flex flex-col justify-center items-center space-y-2 border-primary rounded-lg shadow-lg select-none">
       <h1 className=" text-2xl font-bold">Income Group</h1>
       <div id="pie-chart" />
       <div id="mainTooltip" className="hidden">

@@ -8,7 +8,7 @@ function BarChart({ timeRange }) {
 
   function drawChart() {
     var width = 900,
-      height = 500;
+      height = 400;
 
     // Remove the old svg
     d3.select("svg").remove();
@@ -127,7 +127,7 @@ function BarChart({ timeRange }) {
     });
   }
   return (
-    <div className="w-[1000px]">
+    <div className="w-[900px]">
       <div className="  border-2 px-10 py-5 flex flex-col justify-center items-center space-y-1 border-primary rounded-lg shadow-lg select-none">
         <h1 className=" text-2xl font-bold">Conflict</h1>
         {/* <svg width="900" height="500"></svg> */}
