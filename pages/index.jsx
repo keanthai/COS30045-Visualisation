@@ -49,7 +49,7 @@ export default function Home() {
         )}
         onClick={() => setDataState(ProblemList.Conflict)}
       >
-        Conflict
+        Conflict & Violence
       </button>
 
       <button

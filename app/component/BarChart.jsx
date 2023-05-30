@@ -129,7 +129,7 @@ function BarChart({ timeRange }) {
   return (
     <div className="w-[900px]">
       <div className="  border-2 px-10 py-5 flex flex-col justify-center items-center space-y-1 border-primary rounded-lg shadow-lg select-none">
-        <h1 className=" text-2xl font-bold">Conflict</h1>
+        <h1 className=" text-2xl font-bold">Conflict & Violence</h1>
         {/* <svg width="900" height="500"></svg> */}
         <div id="mainChart"></div>
         <div id="mainTooltip" className="hidden">
