@@ -221,14 +221,7 @@ function StackArea({timeRange}) {
       <div className=" min-h-[200px] border-2 border-primary rounded-lg mt-5 py-4 px-4 space-y-4  shadow-lg select-none">
         <h1 className="text-2xl font-bold text-center ">Description</h1>
         <p className=" text-lg text-left">
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facere
-          doloremque aspernatur reprehenderit odio, tempora temporibus dolorum
-          expedita veritatis eius iste inventore vel hic maiores eaque provident
-          unde minima magni sed Lorem ipsum dolor, sit amet consectetur
-          adipisicing elit. Reiciendis, recusandae tempora autem maxime minus
-          cupiditate dolore aliquid iure quos laudantium. Omnis, earum dolor
-          mollitia voluptatibus molestias adipisci repellendus quibusdam aut?
-          lo!
+        Here we have the Disaster Stacked Area Chart. This chart illustrates the impact of natural disasters on global migration patterns over time. By interacting with this visualization, you can track the history of disaster-induced displacements and see how specific events have influenced global migration.
         </p>
       </div>
     </div>
