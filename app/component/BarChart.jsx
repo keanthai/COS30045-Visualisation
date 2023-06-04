@@ -1,111 +1,21 @@
 import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
-import Select from 'react-select';
-import {options} from '../options';
+import Select from "react-select";
+import { countryOptions } from "../options";
 
 function BarChart({ timeRange }) {
-
   const [selectedOption, setSelectedOption] = useState([]);
 
   useEffect(() => {
-
-    // if(selectedOption.length != 0){
-
-    //   const keys = selectedOption.map((option)=> option.value)
-    //   drawStack(keys);
-    // }
-    // else 
-    drawChart();
+    const keys = selectedOption.map((option) => option.value);
+    // Remove the old svg
+    d3.select("#mainChart").select("svg").remove();
+    drawChart(keys);
   }, [timeRange, selectedOption]);
 
-  function drawStack(keys){
+  function drawChart(keys) {
     var width = 800,
       height = 400;
-
-    // Remove the old svg
-    d3.select("svg").remove();
-
-    var svg = d3
-      .select("#mainChart")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height);
-
-      var svg = d3
-      .select("#mainChart")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height);
-
-    var margin = 200,
-      width = svg.attr("width") - margin,
-      height = svg.attr("height") - margin;
-
-
-    d3.csv("conflict.csv").then(function (dataList){
-
-      var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-      var stack = d3.stack().keys(keys).order(d3.stackOrderReverse);
-
-      var series = stack(dataList);
-
-      var yScale = d3
-      .scaleLinear()
-      .domain([
-        0,
-        d3.max(dataList, function (d) {
-
-          var result = 0;
-          keys.map((key)=> result += parseInt(d[key]))
-          return result;
-        }),
-      ])
-      .range([height, 0]);
-
-      var xScale = d3
-        .scaleBand()
-        .domain(d3.range(dataList.length))
-        .range([0, width])
-        .paddingInner(0.05);
-
-
-        var groups = svg
-        .selectAll("g")
-        .data(series)
-        .enter()
-        .append("g")
-        .style("fill", function (d, i) {
-          return color(i);
-        });
-
-        var rec = groups
-        .selectAll("rect")
-        .data(function (d) {
-          return d;
-        })
-        .enter()
-        .append("rect")
-        .attr("x", function (d, i) {
-          return xScale(i);
-        })
-        .attr("y", function (d, i) {
-          return yScale(d[1]);
-        })
-        .attr("height", function (d) {
-          return yScale(d[0]) - yScale(d[1]);
-        })
-        .attr("width", xScale.bandwidth());
-
-
-    })
-  }
-  function drawChart() {
-    var width = 800,
-      height = 400;
-
-    // Remove the old svg
-    d3.select("svg").remove();
 
     var svg = d3
       .select("#mainChart")
@@ -125,14 +35,28 @@ function BarChart({ timeRange }) {
       .attr("transform", "translate(" + 100 + "," + 100 + ")");
 
     d3.csv("conflict.csv").then(function (dataList) {
-
-      //filter
+      //filter by year
       var data = dataList.filter(
         (item) =>
           item.Year >= 2013 + timeRange[0] && item.Year <= 2013 + timeRange[1]
       );
 
-      
+      //filter by countries
+      if (keys.length > 0) {
+        data.map((d)=>{
+          var total = 0;
+
+          keys.map((key) => {
+            if (d[key] != "") {
+              total += parseInt(d[key]);
+            }
+          });
+
+          d.Total = total;
+        })
+
+      }
+
       xScale.domain(
         data.map(function (d) {
           return d.Year;
@@ -156,7 +80,7 @@ function BarChart({ timeRange }) {
           d3
             .axisLeft(yScale)
             .tickFormat(function (d) {
-              return d.toString().substring(0, 2) + " M";
+              return d.toLocaleString("en-US");
             })
             .ticks(10)
         )
@@ -195,10 +119,12 @@ function BarChart({ timeRange }) {
           return xScale(d.Year);
         })
         .attr("y", function (d) {
+
           return yScale(d.Total);
         })
         .attr("width", xScale.bandwidth())
         .attr("height", function (d) {
+
           return height - yScale(d.Total);
         })
         .attr("fill", "#2A58BF")
@@ -212,7 +138,12 @@ function BarChart({ timeRange }) {
             .style("top", mousePos[1] + "px")
             .select("#value")
             .attr("text-anchor", "middle")
-            .html(d.Year + "<br />" + parseInt(d.Total).toLocaleString("en-US") + " People");
+            .html(
+              d.Year +
+                "<br />" +
+                parseInt(d.Total).toLocaleString("en-US") +
+                " People"
+            );
 
           d3.select("#mainTooltip").classed("hidden", false);
         })
@@ -224,15 +155,15 @@ function BarChart({ timeRange }) {
   }
   return (
     <div className="w-[800px]">
-      <label>Select Countries</label>
-      <Select 
-      value={selectedOption}
-      onChange={setSelectedOption}
-      isMulti
-      options={options}
-      name="Select Countries"
-      className=" w-[350px] mb-4"
-      classNamePrefix="select"
+      <label className=" text-lg font-semibold">Countries of Origin</label>
+      <Select
+        value={selectedOption}
+        onChange={setSelectedOption}
+        isMulti
+        options={countryOptions}
+        name="Select Countries"
+        className=" w-[350px] mb-4"
+        classNamePrefix="select"
       />
       <div className="  border-2 px-10 py-5 flex flex-col justify-center items-center space-y-1 border-primary rounded-lg shadow-lg select-none">
         <h1 className=" text-2xl font-bold">Conflict & Violence</h1>

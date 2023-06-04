@@ -1,13 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
+import Select from "react-select";
+import { hazardOptions } from "../options";
 
 function StackArea({timeRange}) {
+  const [selectedOption, setSelectedOption] = useState([]);
 
   useEffect(() => {
-    drawChart();
-  }, [timeRange]);
 
-  function drawChart() {
+    drawChart();
+  }, [timeRange, selectedOption]);
+
+  const drawChart = async() =>{
+
+    //Get data
+    var dataList = null;
+    var keys = [];
+    if(selectedOption.length > 0){
+      dataList = await d3.csv("disaster_hazard.csv");
+      keys = selectedOption.map((option) => option.value);
+    }
+    else{
+      dataList = await d3.csv("disaster.csv");
+      keys = dataList.columns.slice(1);
+    }
+
     // Remove the old svg
     d3.select("#stack").select("svg").remove();
 
@@ -25,36 +42,24 @@ function StackArea({timeRange}) {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.csv("disaster.csv").then(function (dataList) {
       // List of groups = header of the csv files
 
       var data = dataList.filter(
         (item) =>
-          item.year >= 2013 + timeRange[0] && item.year <= 2013 + timeRange[1]
+          item.Year >= 2013 + timeRange[0] && item.Year <= 2013 + timeRange[1]
       );
 
-      var keys = dataList.columns.slice(1);
+
       // color palette
       var color = d3.scaleOrdinal().domain(keys).range(d3.schemeSet2);
 
       //stack the data?
       var stackedData = d3.stack().keys(keys)(data);
-
-      // Add X axis
-      // var x = d3
-      //   .scaleLinear()
-      //   .domain(
-      //     d3.extent(data, function (d) {
-      //       return d.year;
-      //     })
-      //   )
-      //   .range([0, width]);
-
-      var x = d3.scaleBand().range([0, width]).padding(0.4);
+      var x = d3.scaleBand().range([0, width]).padding(1);
 
       x.domain(
         data.map(function (d) {
-          return d.year;
+          return d.Year;
         })
       );
       var xAxis = svg
@@ -82,8 +87,20 @@ function StackArea({timeRange}) {
         .text("# of Disaster Internal Displacements")
         .attr("text-anchor", "start");
 
+        //get max
+        var max = d3.max(data, function(d){
+
+          var list = keys.map((key)=> {
+            return parseInt(d[key])
+          })
+          var m = Math.max(...list)
+
+          return m;
+        })
+
       // Add Y axis
-      var y = d3.scaleLinear().domain([0, 35000000]).range([height, 0]);
+      var y = d3.scaleLinear().domain([0, max ]).range([height, 0]);
+
       svg.append("g").style("font", "16px times").call(d3.axisLeft(y).ticks(5));
 
       var clip = svg
@@ -96,15 +113,6 @@ function StackArea({timeRange}) {
         .attr("x", 0)
         .attr("y", 0);
 
-      // Add brushing
-      var brush = d3
-        .brushX() // Add the brush feature using the d3.brush function
-        .extent([
-          [0, 0],
-          [width, height],
-        ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-        .on("end", updateChart); // Each time the brush selection changes, trigger the 'updateChart' function
-
       // Create the scatter variable: where both the circles and the brush take place
       var areaChart = svg.append("g").attr("clip-path", "url(#clip)");
 
@@ -112,14 +120,14 @@ function StackArea({timeRange}) {
       var area = d3
         .area()
         .x(function (d) {
-          return x(d.data.year);
+          return x(d.data.Year);
         })
         .y0(function (d) {
           return y(d[0]);
         })
         .y1(function (d) {
           return y(d[1]);
-        });
+        })
 
       // Show the areas
       areaChart
@@ -135,37 +143,12 @@ function StackArea({timeRange}) {
         })
         .attr("d", area);
 
-      // Add the brushing
-      areaChart.append("g").attr("class", "brush").call(brush);
-
       var idleTimeout;
       function idled() {
         idleTimeout = null;
       }
 
-      // A function that update the chart for given boundaries
-      function updateChart() {
-        extent = d3.selection;
-
-        // If no selection, back to initial coordinate. Otherwise, update X axis domain
-        if (!extent) {
-          if (!idleTimeout) return (idleTimeout = setTimeout(idled, 350)); // This allows to wait a little bit
-          x.domain(
-            d3.extent(data, function (d) {
-              return d.year;
-            })
-          );
-        } else {
-          x.domain([x.invert(extent[0]), x.invert(extent[1])]);
-          areaChart.select(".brush").call(brush.move, null); // This remove the grey brush area as soon as the selection has been done
-        }
-
-        // Update axis and area position
-        xAxis.transition().duration(1000).call(d3.axisBottom(x).ticks(5));
-        areaChart.selectAll("path").transition().duration(1000).attr("d", area);
-      }
-
-      var highlight = function (d) {
+      var highlight = function (event,d) {
         // reduce opacity of all groups
         d3.selectAll(".myArea").style("opacity", 0.1);
         // expect the one that is hovered
@@ -184,7 +167,7 @@ function StackArea({timeRange}) {
         .data(keys)
         .enter()
         .append("rect")
-        .attr("x", 500)
+        .attr("x", 450)
         .attr("y", function (d, i) {
           return 10 + i * (size + 5);
         }) // 100 is where the first dot appears. 25 is the distance between dots
@@ -202,7 +185,7 @@ function StackArea({timeRange}) {
         .data(keys)
         .enter()
         .append("text")
-        .attr("x", 500 + size * 1.2)
+        .attr("x", 450 + size * 1.2)
         .attr("y", function (d, i) {
           return 10 + i * (size + 5) + size / 2;
         }) // 100 is where the first dot appears. 25 is the distance between dots
@@ -216,11 +199,20 @@ function StackArea({timeRange}) {
         .style("alignment-baseline", "middle")
         .on("mouseover", highlight)
         .on("mouseleave", noHighlight);
-    });
   }
 
   return (
     <div className="w-[800px]">
+      <label className=" text-lg font-semibold">Hazard Type</label>
+      <Select
+        value={selectedOption}
+        onChange={setSelectedOption}
+        isMulti
+        options={hazardOptions}
+        name="Select Countries"
+        className=" w-[350px] mb-4"
+        classNamePrefix="select"
+      />
       <div className=" border-2 px-10 py-5 flex flex-col justify-center items-center space-y-1 border-primary rounded-lg shadow-lg select-none">
         <h1 className=" text-2xl font-bold">Disaster</h1>
         <div id="stack"></div>
