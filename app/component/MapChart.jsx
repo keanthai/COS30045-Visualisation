@@ -92,7 +92,9 @@ function MapChart() {
 
             var mousePos = [event.clientX, event.clientY];
             var value = d.properties.value ? parseInt(d.properties.value).toLocaleString("en-US") : "Unknown";
-            d3.select("#mainTooltip")
+
+            if(value != "Unknown"){
+              d3.select("#mainTooltip")
               .style("left", mousePos[0] + "px")
               .style("top", mousePos[1] + "px")
               .select("#value")
@@ -105,6 +107,8 @@ function MapChart() {
               );
 
             d3.select("#mainTooltip").classed("hidden", false);
+            }
+            
           })
           .on("mouseout", function (d) {
             d3.select(this).attr("fill", "#2A58BF");
