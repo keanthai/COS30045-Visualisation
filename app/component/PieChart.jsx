@@ -3,11 +3,17 @@ import * as d3 from "d3";
 
 function PieChart() {
   const data = [
-    { label: "High Income", value: 160366582 },
-    { label: "Middle Income", value: 76123099 },
-    { label: "Lower Income", value: 11869725 },
-    { label: "No Income Group Available", value: 7101890 },
+    { label: "High Income", value: 336178411 },
+    { label: "Middle Income", value: 158360780 },
+    { label: "Lower Income", value: 24941824 },
   ];
+
+  const top = {
+     high: ["India", "Mexico", "China", "Philippines", "Pakistan"],
+     middle: ["Russia", "Syrian", "Ukraine", "Afghanistan", "Bangladesh"],
+    low: ["South Sudan", "Sudan", "Congo", "Côte d'Ivoire", "Somalia"]
+}
+
   const colors = [
     "#C0504D",
     "#4BABC6",
@@ -116,9 +122,30 @@ function PieChart() {
           .style("top", mousePos[1]+ "px")
           .select("#value")
           .attr("text-anchor", "middle")
-          .html(d.data.label + "<br />" + d.data.value + " People");
+          .html(d.data.label + "<br />" + d.data.value.toLocaleString("en-US") + " People");
 
         d3.select("#mainTooltip").classed("hidden", false);
+      })
+      .on("click", function(event, d){
+        var mousePos = [event.clientX, event.clientY]
+
+        
+        var output = "Top 5 countries of origin:<br/>"
+        var t = "";
+
+        if(d.data.label == "High Income") top.high.map((value)=> t += value + "<br/>")
+        else if(d.data.label == "Middle Income") top.middle.map((value)=> t += value + "<br/>")
+        else top.low.map((value)=> t += value + "<br/>")
+
+        output += t;
+
+        d3.select("#mainTooltip")
+          .style("left", mousePos[0] + "px")
+          .style("top", mousePos[1]+ "px")
+          .select("#value")
+          .attr("text-anchor", "middle")
+          .html(output);
+
       })
       .on("mouseout", function (d) {
         d3.select(this).attr("stroke", "none").style("filter", "none");
@@ -150,12 +177,12 @@ function PieChart() {
     <div className="w-[800px]">
     <div className="  border-2 px-10 py-5 flex flex-col justify-center items-center space-y-2 border-primary rounded-lg shadow-lg select-none">
       <h1 className=" text-2xl font-bold">Income Group</h1>
-      <div id="pie-chart" />
+      <div className=" cursor-pointer" id="pie-chart" />
       <div id="mainTooltip" className="hidden">
         <p><span id="value"></span></p>
       </div>
 
-      <div className="grid grid-cols-2">
+      <div className="flex space-x-5">
 
         {
           data.map((value, index)=>{

@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import * as d3 from "d3";
 
-function StackArea() {
+function StackArea({timeRange}) {
+
   useEffect(() => {
     drawChart();
-  }, []);
+  }, [timeRange]);
 
   function drawChart() {
     // Remove the old svg
@@ -12,7 +13,7 @@ function StackArea() {
 
     // set the dimensions and margins of the graph
     var margin = { top: 60, right: 230, bottom: 100, left: 150 },
-      width = 900 - margin.left - margin.right,
+      width =800 - margin.left - margin.right,
       height = 400 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
@@ -24,10 +25,15 @@ function StackArea() {
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.csv("disaster.csv").then(function (data) {
+    d3.csv("disaster.csv").then(function (dataList) {
       // List of groups = header of the csv files
 
-      var keys = data.columns.slice(1);
+      var data = dataList.filter(
+        (item) =>
+          item.year >= 2013 + timeRange[0] && item.year <= 2013 + timeRange[1]
+      );
+
+      var keys = dataList.columns.slice(1);
       // color palette
       var color = d3.scaleOrdinal().domain(keys).range(d3.schemeSet2);
 
@@ -35,19 +41,27 @@ function StackArea() {
       var stackedData = d3.stack().keys(keys)(data);
 
       // Add X axis
-      var x = d3
-        .scaleLinear()
-        .domain(
-          d3.extent(data, function (d) {
-            return d.year;
-          })
-        )
-        .range([0, width]);
+      // var x = d3
+      //   .scaleLinear()
+      //   .domain(
+      //     d3.extent(data, function (d) {
+      //       return d.year;
+      //     })
+      //   )
+      //   .range([0, width]);
+
+      var x = d3.scaleBand().range([0, width]).padding(0.4);
+
+      x.domain(
+        data.map(function (d) {
+          return d.year;
+        })
+      );
       var xAxis = svg
         .append("g")
         .style("font", "16px times")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).ticks(5));
+        .call(d3.axisBottom(x));
 
       // Add X axis label:
       svg
@@ -69,7 +83,7 @@ function StackArea() {
         .attr("text-anchor", "start");
 
       // Add Y axis
-      var y = d3.scaleLinear().domain([0, 200000]).range([height, 0]);
+      var y = d3.scaleLinear().domain([0, 35000000]).range([height, 0]);
       svg.append("g").style("font", "16px times").call(d3.axisLeft(y).ticks(5));
 
       var clip = svg
@@ -170,7 +184,7 @@ function StackArea() {
         .data(keys)
         .enter()
         .append("rect")
-        .attr("x", 400)
+        .attr("x", 500)
         .attr("y", function (d, i) {
           return 10 + i * (size + 5);
         }) // 100 is where the first dot appears. 25 is the distance between dots
@@ -188,7 +202,7 @@ function StackArea() {
         .data(keys)
         .enter()
         .append("text")
-        .attr("x", 400 + size * 1.2)
+        .attr("x", 500 + size * 1.2)
         .attr("y", function (d, i) {
           return 10 + i * (size + 5) + size / 2;
         }) // 100 is where the first dot appears. 25 is the distance between dots
@@ -206,7 +220,7 @@ function StackArea() {
   }
 
   return (
-    <div className="w-[1000px]">
+    <div className="w-[800px]">
       <div className=" border-2 px-10 py-5 flex flex-col justify-center items-center space-y-1 border-primary rounded-lg shadow-lg select-none">
         <h1 className=" text-2xl font-bold">Disaster</h1>
         <div id="stack"></div>

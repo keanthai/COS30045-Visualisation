@@ -5,6 +5,8 @@ import PieChart from "../app/component/PieChart.jsx";
 import StackArea from "../app/component/StackArea";
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
+import MapChart from "../app/component/MapChart";
+import RegionChart from "../app/component/RegionChart";
 
 const ProblemList = {
   Income: "income",
@@ -15,7 +17,7 @@ const ProblemList = {
 
 export default function Home() {
   const [dataState, setDataState] = useState(ProblemList.Income);
-  const [timeRange, setTimeRange] = useState([0, 9]);
+  const [timeRange, setTimeRange] = useState([0, 8]);
 
   const handleRangeChange = (event, newValue )=>{
     setTimeRange(newValue)
@@ -25,9 +27,9 @@ export default function Home() {
     return 2013 + value;
   }
   return (
-    <div className=" mx-10 my-5 space-y-3">
+    <div className="mx-auto w-fit my-5 space-y-3">
       <h1 className=" text-3xl font-bold">Global Issues of Migration</h1>
-      <h3>Total people by Origin and destination</h3>
+      {/* <h3>Total people by Origin and destination</h3> */}
 
       <button
         className={classNames(
@@ -65,7 +67,7 @@ export default function Home() {
       </button>
 
       {
-        dataState == ProblemList.Conflict ?
+        dataState != ProblemList.Income ?
         <div >
           <h1 className=" text-lg font-semibold">TimeScale {2013 + timeRange[0]} - {2013 + timeRange[1]} </h1>
         <Box sx={{ width: 200 }} >
@@ -74,7 +76,7 @@ export default function Home() {
           value={timeRange}
           min={0}
           step={1}
-          max={9}
+          max={8}
           scale={calculateValue}
           onChange={handleRangeChange}
           valueLabelDisplay="auto"
@@ -84,8 +86,9 @@ export default function Home() {
       </div>:<div></div>
       }
       
+      {/* <RegionChart/> */}
 
-      {dataState == ProblemList.Income ? <PieChart /> : dataState == ProblemList.Conflict ? <BarChart timeRange={timeRange}/> : <StackArea/>}
+      {dataState == ProblemList.Income ? <PieChart /> : dataState == ProblemList.Conflict ? <BarChart timeRange={timeRange}/> : <StackArea timeRange={timeRange}/>}
     </div>
   );
 }
