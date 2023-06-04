@@ -123,13 +123,26 @@ function MapChart() {
   };
 
   return (
-    <div>
+    <div >
       <div id="chart" className=" cursor-pointer"></div>
       <div id="mainTooltip" className="hidden">
           <p>
             <span id="value"></span>
           </p>
         </div>
+        <div className=" w-[1000px] border-2 border-primary rounded-lg mt-5 py-4 px-4 space-y-4  shadow-lg select-none">
+        <h1 className="text-2xl font-bold text-center ">Description</h1>
+        <p className=" text-lg text-left">
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facere
+          doloremque aspernatur reprehenderit odio, tempora temporibus dolorum
+          expedita veritatis eius iste inventore vel hic maiores eaque provident
+          unde minima magni sed Lorem ipsum dolor, sit amet consectetur
+          adipisicing elit. Reiciendis, recusandae tempora autem maxime minus
+          cupiditate dolore aliquid iure quos laudantium. Omnis, earum dolor
+          mollitia voluptatibus molestias adipisci repellendus quibusdam aut?
+          lo!
+        </p>
+      </div>
     </div>
   );
 }

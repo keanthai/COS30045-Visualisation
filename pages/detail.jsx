@@ -17,7 +17,7 @@ const ProblemList = {
 export default function Detail() {
   
   const router =useRouter();
-  const [dataState, setDataState] = useState(ProblemList.Income);
+  const [dataState, setDataState] = useState(ProblemList.Conflict);
   const [timeRange, setTimeRange] = useState([0, 8]);
 
   const handleRangeChange = (event, newValue )=>{
@@ -33,17 +33,7 @@ export default function Detail() {
       <h1 className=" text-3xl font-bold">Global Issues of Migration</h1>
       {/* <h3>Total people by Origin and destination</h3> */}
 
-      <button
-        className={classNames(
-          dataState == ProblemList.Income
-            ? "bg-blue-700 text-white"
-            : "bg-white text-blue-700 border-2 border-blue-700",
-          " px-6 py-3 rounded-lg mx-2 shadow-md"
-        )}
-        onClick={() => setDataState(ProblemList.Income)}
-      >
-        Income Groups
-      </button>
+     
       <button
         className={classNames(
           dataState == ProblemList.Conflict
@@ -66,6 +56,17 @@ export default function Detail() {
         onClick={() => setDataState(ProblemList.Disaster)}
       >
         Disaster
+      </button>
+      <button
+        className={classNames(
+          dataState == ProblemList.Income
+            ? "bg-blue-700 text-white"
+            : "bg-white text-blue-700 border-2 border-blue-700",
+          " px-6 py-3 rounded-lg mx-2 shadow-md"
+        )}
+        onClick={() => setDataState(ProblemList.Income)}
+      >
+        Income Groups
       </button>
 
       {
