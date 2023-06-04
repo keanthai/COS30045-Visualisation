@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
 import Select from "react-select";
-import { countryOptions } from "../options";
+import { countries, countryOptions } from "../options";
+import { useRouter } from "next/router";
 
 function BarChart({ timeRange }) {
-  const [selectedOption, setSelectedOption] = useState([]);
+  const router = useRouter();
+  const {country} = router.query;
+  var defaultOption = countries.includes(country) ? [{label: country, value: country}]: [];
+  const [selectedOption, setSelectedOption] = useState( defaultOption);
+
 
   useEffect(() => {
     const keys = selectedOption.map((option) => option.value);
@@ -95,7 +100,7 @@ function BarChart({ timeRange }) {
         .append("text")
         .attr("text-anchor", "end")
         .attr("x", width + 100)
-        .attr("y", height + 150)
+        .attr("y", height + 145)
         .style("font", "22px times")
         .text("Time (year)");
 
@@ -155,7 +160,7 @@ function BarChart({ timeRange }) {
   }
   return (
     <div className="w-[800px]">
-      <label className=" text-lg font-semibold">Countries of Origin</label>
+      <label className=" text-lg font-semibold"> Select Countries of Origin</label>
       <Select
         value={selectedOption}
         onChange={setSelectedOption}

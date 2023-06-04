@@ -13,3 +13,8 @@
 #value{
     @apply text-xl
 }
+
+.country{
+    fill: #ccc;
+    stroke: #999;
+}

@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
 import BarChart from "../app/component/BarChart";
 import PieChart from "../app/component/PieChart.jsx";
 import StackArea from "../app/component/StackArea";
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import MapChart from "../app/component/MapChart";
+import { useRouter } from "next/router";
 
 const ProblemList = {
   Income: "income",
@@ -15,7 +15,9 @@ const ProblemList = {
 
 
 export default function Detail() {
-  const [dataState, setDataState] = useState(ProblemList.Conflict);
+  
+  const router =useRouter();
+  const [dataState, setDataState] = useState(ProblemList.Income);
   const [timeRange, setTimeRange] = useState([0, 8]);
 
   const handleRangeChange = (event, newValue )=>{
@@ -27,6 +29,7 @@ export default function Detail() {
   }
   return (
     <div className="mx-auto w-fit my-5 space-y-3">
+      <button className=" bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md " onClick={()=> router.push("/")}>Back to Map</button>
       <h1 className=" text-3xl font-bold">Global Issues of Migration</h1>
       {/* <h3>Total people by Origin and destination</h3> */}
 
