@@ -80,12 +80,16 @@ function MapChart() {
             }
           })
           .on("click", function(event, d){
-            router.push({
-              pathname: "/detail",
-              query:{
-                country: d.properties.name
-              }
-            })
+
+            if(d.properties.value){
+              router.push({
+                pathname: "/detail",
+                query:{
+                  country: d.properties.name
+                }
+              })
+            } 
+            
           })
           .on("mousemove", function (event, d) {
             d3.select(this).attr("fill", "orange");
@@ -120,7 +124,7 @@ function MapChart() {
 
   return (
     <div>
-      <div id="chart"></div>
+      <div id="chart" className=" cursor-pointer"></div>
       <div id="mainTooltip" className="hidden">
           <p>
             <span id="value"></span>
